@@ -1,0 +1,88 @@
+
+Componenent: 
+	When your app is having more than one component, then, your app may have
+	to start one componenet from another
+		example ..... from within the player component, you may have to start the batsman/bowler component.. 
+		how/what is that you use for starting ---> .html --- > custom tag
+		
+	appComponent... 
+	Every component consists of 4 files.
+	.html --- > tempplate definintion
+	.ts ----> class which contains the code for the component ( functions the defines the behaviour, the data to be 
+	usable in this component)
+	spect.ts 
+	.css --- > component specific styles ---> 
+
+app.component.ts
+
+@Component({
+  selector: 'my-app', // the name of the component / custom tag to be used to start this component...
+					  // and this is the name we can use in the html to refer to this component		
+  templateUrl: './app.component.html', // this is the .html file where you have the UI defined for our component
+  styleUrls: [ './app.component.css' ] // array of stylesheets
+})
+console.log("Hello"); // this line cannot be put... we can put any line of code 
+between the decorator and the class definintion... 
+// class definition must immediately follow the component decorator.......
+export class AppComponent  {
+  name = 'Angular ' + VERSION.major;
+}
+
+Working with multiple components / creating a new component.. 
+	Two ways : 
+	1. Manually  : create the four files required for every component
+				   update app.module.ts	
+	2. Angular CLI : 
+			ng generate component mySecondComponent
+			This command generates the four files + updates the app.module.ts
+===================================================
+Data Binding in Angular :
+	Where is the UI defined : .html (DOM)
+	Where is the data defined : .ts (Component class) 
+	
+	How do you bind the UI in the html to the class properties / variables.. 
+		.ts
+		class player { 
+			runs = 111111
+			name = "Virat" 
+			}
+		.html
+			<div> 
+				<h1> Profile for the player <name of theplayer as defind in the component class> </h1>
+				<p> runs socred is : <here i want to show the runs for that player> ? </p>
+		How ? Data binding... 
+			We have to enable th data to flow between the component class and DOM
+	    2 types of data binding
+		1. one way
+				Interpolation : class ---> DOM ---> String Interpolation ..
+					works good only with the string values... {{}}
+					internally this will be like a PB... interpolation is PB with a easy syntax.  (stringvalues)
+					
+				Property Binding : class ----> DOM 
+						every html tag has two things associated. 
+						a. attribute : html 
+						b. property : where a attribute gets mapped to a DOM  class property
+						<input [value]="something" // here value is called as attribute... 
+						<button [disabled] = true
+						  <input type="email" [value]="propertyDemo" > // propertyDemo is a variable declared in the class
+						  // same could have also been done using interpoloation
+						  
+				for the string values in the component class ... Interpolation..
+				for the non-string values in the component class --- PB
+				
+				Event Binding : DOM ----> class
+					when we have the input types and whatever the user enters needs to be passed from DOM to comp class. 
+				
+				
+		2. two way
+				 NGModal : Class <----> DOM
+			import FormsModule in app.module.ts
+			 imports: [
+				BrowserModule,FormsModule
+			],
+			
+			 <input type="text" [(ngModel)]="pName" placeholder="player" />
+			<label >Enter Runs :</label>
+			<input type="number" [(ngModel)]="pRuns" placeholder="runs" />
+  
+		

@@ -1,0 +1,112 @@
+inline templating :
+@Component
+{
+selector : "aaaa",
+template : '<h1> aaaaaaaa </h1>' , // only single line is allowed by default if 
+		// we are putting the UI definition as a string literal
+		// template literal -- ES2015 onwards 
+		// one can use the backtick on your keyboard and put any no. of lines
+		`<h1> aaaaaaaa </h1>
+		<h1> aaaaaaaa </h1>
+		<h1> aaaaaaaa </h1>
+		<h1> aaaaaaaa </h1>
+		<h1> aaaaaaaa </h1>' 
+========================= 
+8 building blocks ... Components, modules, metadata, DI, template..
+
+Directives		
+		Is also a javascript class. 
+		Which will contain some re-usable logic (either provided by Angular (structural), or written by the developer(custom))
+		write it once, and use it in any component... 
+		
+I have a array of players ["virat", "dhoni","rahul"] and I would like to bind this array to a unordered list in my html?
+UI is defined in .html (declarative syntax)... not the prgramming syntax.
+for me to achive this list to be populated with the array... I have to use a looping logic.. which is not possible in a .html..
+one way to do this is : use JS function in the .html as expression {{ var1 + var2 }}.. what if we have this iteration to be
+ done in multiple places in my UI.... then my rendering logic is repeated... you would see the same kind of code in multiple
+places which is redundant... 
+This is a very common thing which most applications need and they may want to use this logic in multiple places...
+for this reason, in Angular, rather than asking the developer to key in this logic every other place... 
+Angular gives you this re-usable logic thru some in built classes which are called "Structural Directives"
+
+3 types of directives : 
+	1. structural (built-in) :  deals with manipulating DOM elements (adding, removing.....) [list, conditional rendering]
+						ngIf, ngFor, ngSwitch
+						
+						 <p *ngIf = 'flag' > Showing this because flag is true </p>
+						 <select *ngIf = 'ifPlayers' >
+								<option *ngFor = "let i of players"> {{i}}</option>
+						 </select>
+	2. attribute : Deals with changing the look and behavior of the DOM elements
+				   Example : you have an UI which is showing a list of images (players)... you have all the players on contract 
+				   with BCCI, and you are currently running a poll to vote for the MVP for every day in some season.. 
+				   on the player who is the MVP for the day... how do you make the focus to come to the end user?
+				   you may want to zoom-in / zoom-out / animation on that player picture.. you may have to write that logic 
+				   in the component class, but, if we put that logic in the component class, then you are limiting that logic 
+				   only to that component, so to re-use this logic across components... you can 
+				   have your own custome directive and use it in any component				   
+				  
+	Creating a new directive . 2 ways
+	1. Manually : class (.ts) which will have the directive code and @Directive decorator for the class with the metadata,
+	update the app.module.ts
+			
+	2. CLI : ng g directive mycustom
+			create a new .ts + updates app.module.ts.
+	
+	import { Directive,ElementRef,HostListener,Input, HostBinding } from '@angular/core'; 
+	// DI syntax... constructor(private.....)...
+	@Directive({
+		selector: '[appHighlight]' // the name which needs to be used to use this directive...
+					// [] indicates that this is a attribute directive
+					// one can use this like a html atribute
+					<button [disabled]='true'> click Me </button>
+					<h1 appHighlight> Some text to show </h1>
+					
+		})
+	
+	Where is the UI element on to which we have to apply a custom directive? .html ---- > component
+	Where is the logic (changing the backgr9und color, border) for the directive? is in a sperate class (.ts)..
+		somehow, the component class has to pass the reference of the UI element on to which the directive has to be applied.
+		for this , we use "ElementRef" thru DI syntax..
+				constructor(private el: ElementRef) {
+					//el.nativeElement.innerText = "Text is changed by changeText Directive. "
+				this.highlightColor = 'cyan'
+				console.log("Directive Constructor", el.nativeElement);
+
+        }
+	look (background,border) and behaviour (event --- > mouseover/mouseleave)	
+	There is a point of time in the component class, when this directive has to be applied . so, it is 
+	essential for the directive to have a listener for that particular event (HostListener)...
+	there is a specific html property/attribute on to which the directive has towork (border), so , we have 
+	to bind that property of the comoponent UI with the directive class. (HostBinding)
+	@Input ---> used to send the selected color from the component class to the directive class.
+	
+		@Input( ) highlightColor: string;
+
+		@HostListener('mouseleave') onMouseLeave(){
+			  this.highlight(null)
+		}
+		@HostBinding('style.border') myborder:string;
+
+		@HostListener('mouseenter') onMouseEnter(){
+		//this.highlight('cyan')
+		  this.highlight(this.highlightColor || 'purple');
+
+		}
+
+		// this method is being called in onmouseenter/onmouseleave 
+		private highlight(color:string){  
+		  this.el.nativeElement.style.backgroundColor = color;
+		  //this.el.nativeElement.style.border = 1;
+		  
+		  this.myborder = '5px solid blue';  
+		}
+		
+		How the below line works ?
+		<p appHighlight [highlightColor]="color"> Highlight Me</p>
+		when the browser renders the DOM, it reads this html attribute "appHighlight", because it is a custom directive,
+		1. the UI element reference is passed to the directive constructor... 
+		2. @hostbind, @hostListener in the directive class.. a listener is set up for the registerd events (m0useenter/mouseleave)
+		3. property reference is set up (border)..
+		4. for that the selected color is passed as a input argument (@input).
+		
